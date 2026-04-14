@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Motor Load Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#0a0c10;font-family:'Courier New',monospace;color:#e0e0e0;padding:20px 16px 40px}
+h1{text-align:center;font-size:1.2rem;font-weight:900;letter-spacing:.15em;color:#ff8c00;text-shadow:0 0 20px rgba(255,140,0,.5);margin-bottom:4px}
+.sub{text-align:center;font-size:.65rem;color:#555;letter-spacing:.2em;margin-bottom:24px}
+.back-btn{display:block;text-align:center;margin-bottom:20px;color:#ff8c00;font-size:.65rem;letter-spacing:.15em;text-decoration:none;border:1px solid rgba(255,140,0,.3);border-radius:20px;padding:6px 16px;width:fit-content;margin-left:auto;margin-right:auto}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,140,0,.2);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#ff8c00,transparent)}
+.card-title{font-size:.65rem;letter-spacing:.2em;color:#ff8c00;margin-bottom:12px;text-transform:uppercase}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.ph label{display:block;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;text-align:center}
+.ph input{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 4px;font-family:'Courier New',monospace;font-size:1rem;color:#fff;text-align:center;outline:none;-moz-appearance:textfield}
+.ph input::-webkit-outer-spin-button,.ph input::-webkit-inner-spin-button{-webkit-appearance:none}
+.r label{color:#ff4444}.y label{color:#ffdd00}.b label{color:#4488ff}
+.r input:focus{border-color:#ff4444;box-shadow:0 0 8px rgba(255,68,68,.3)}
+.y input:focus{border-color:#ffdd00;box-shadow:0 0 8px rgba(255,221,0,.3)}
+.b input:focus{border-color:#4488ff;box-shadow:0 0 8px rgba(68,136,255,.3)}
+.avg{text-align:center;font-size:.6rem;color:#555;margin-top:6px}
+.avg span{color:#888}
+.pf-row{display:flex;align-items:center;gap:10px}
+.pf-row label{color:#ff8c00;font-size:.65rem;white-space:nowrap;letter-spacing:.1em}
+.pf-row input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:1rem;color:#ff8c00;text-align:center;outline:none;-moz-appearance:textfield}
+.pf-row input::-webkit-outer-spin-button,.pf-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+.result{background:rgba(255,140,0,.05);border:1px solid rgba(255,140,0,.35);border-radius:12px;padding:20px 16px;margin-bottom:14px;text-align:center}
+.res-label{font-size:.6rem;letter-spacing:.25em;color:#ff8c00;margin-bottom:6px;text-transform:uppercase}
+.res-val{font-size:2.8rem;font-weight:900;color:#fff;text-shadow:0 0 30px rgba(255,140,0,.6);line-height:1}
+.res-unit{font-size:1rem;color:#ff8c00;letter-spacing:.3em;margin-top:4px}
+.res-sub{font-size:.65rem;color:#555;margin-top:8px}
+.res-sub span{color:#888}
+.formula{font-size:.58rem;color:#333;text-align:center;margin-top:6px}
+.conv-title{font-size:.65rem;letter-spacing:.2em;color:#44aaff;margin-bottom:12px;text-transform:uppercase}
+.conv-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.conv-row input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(68,170,255,.3);border-radius:8px;padding:11px;font-family:'Courier New',monospace;font-size:1.05rem;color:#44aaff;text-align:center;outline:none;-moz-appearance:textfield}
+.conv-row input::-webkit-outer-spin-button,.conv-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+.conv-unit{font-size:.65rem;color:#555;min-width:25px;text-align:center}
+.swap-btn{background:rgba(68,170,255,.1);border:1px solid rgba(68,170,255,.3);border-radius:50%;width:36px;height:36px;color:#44aaff;font-size:1rem;cursor:pointer;flex-shrink:0}
+.conv-result{background:rgba(68,170,255,.05);border:1px solid rgba(68,170,255,.2);border-radius:8px;padding:12px;text-align:center;margin-top:8px;display:none}
+.conv-result .val{font-size:1.6rem;font-weight:700;color:#44aaff;text-shadow:0 0 15px rgba(68,170,255,.4)}
+.conv-result .badge{display:inline-block;background:rgba(68,170,255,.15);border:1px solid rgba(68,170,255,.3);border-radius:4px;padding:2px 8px;font-size:.6rem;color:#44aaff;margin-left:6px;vertical-align:middle}
+.reset-btn{width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.62rem;letter-spacing:.2em;color:#444;cursor:pointer;margin-top:4px}
+.reset-btn:active{border-color:rgba(255,255,255,.3);color:#888}
+</style>
+</head>
+<body>
+
+<a class="back-btn" href="index.html">← BACK TO HOME</a>
+<h1>⚙️ MOTOR LOAD CALCULATOR</h1>
+<p class="sub">3-PHASE INDUCTION MOTOR</p>
+
+<!-- Voltage -->
+<div class="card">
+  <div class="card-title">📊 Voltage (V) — Line to Line</div>
+  <div class="grid3">
+    <div class="ph r"><label>R — Y</label><input type="number" id="vRY" placeholder="0" oninput="calc()"></div>
+    <div class="ph y"><label>Y — B</label><input type="number" id="vYB" placeholder="0" oninput="calc()"></div>
+    <div class="ph b"><label>B — R</label><input type="number" id="vBR" placeholder="0" oninput="calc()"></div>
+  </div>
+  <div class="avg">V avg: <span id="vAvg">---</span></div>
+</div>
+
+<!-- Current -->
+<div class="card">
+  <div class="card-title">⚡ Current (A) — Per Phase</div>
+  <div class="grid3">
+    <div class="ph r"><label>R-Phase</label><input type="number" id="iR" placeholder="0" oninput="calc()"></div>
+    <div class="ph y"><label>Y-Phase</label><input type="number" id="iY" placeholder="0" oninput="calc()"></div>
+    <div class="ph b"><label>B-Phase</label><input type="number" id="iB" placeholder="0" oninput="calc()"></div>
+  </div>
+  <div class="avg">I avg: <span id="iAvg">---</span></div>
+</div>
+
+<!-- PF -->
+<div class="card">
+  <div class="pf-row">
+    <label>POWER FACTOR</label>
+    <input type="number" id="pf" placeholder="0.85" value="0.85" min="0" max="1" step="0.01" oninput="calc()">
+  </div>
+  <div class="formula">Formula: HP = (√3 × V_avg × I_avg × PF) ÷ 746</div>
+</div>
+
+<!-- Result -->
+<div class="result">
+  <div class="res-label">MOTOR LOAD</div>
+  <div class="res-val" id="hpVal">—</div>
+  <div class="res-unit">HORSE POWER</div>
+  <div class="res-sub">kW: <span id="kwVal">---</span> &nbsp;|&nbsp; Watts: <span id="wVal">---</span></div>
+</div>
+
+<!-- Converter -->
+<div class="card">
+  <div class="conv-title">🔄 kW ↔ HP Converter</div>
+  <div class="conv-row">
+    <input type="number" id="convIn" placeholder="Enter value" oninput="convert()">
+    <span class="conv-unit" id="fromUnit">kW</span>
+    <button class="swap-btn" onclick="swapConv()">⇄</button>
+    <span class="conv-unit" id="toUnit">HP</span>
+  </div>
+  <div class="conv-result" id="convResult">
+    <span class="val" id="convVal">0</span>
+    <span class="badge" id="convBadge">HP</span>
+  </div>
+  <div class="formula">1 kW = 1.34102 HP &nbsp;|&nbsp; 1 HP = 0.7457 kW</div>
+</div>
+
+<button class="reset-btn" onclick="resetAll()">↺ RESET ALL VALUES</button>
+
+<script>
+var convDir='
