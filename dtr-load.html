@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DTR Load Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#0a0c10;font-family:'Courier New',monospace;color:#e0e0e0;padding:20px 16px 40px}
+h1{text-align:center;font-size:1.2rem;font-weight:900;letter-spacing:.15em;color:#ff8c00;text-shadow:0 0 20px rgba(255,140,0,.5);margin-bottom:4px}
+.sub{text-align:center;font-size:.65rem;color:#555;letter-spacing:.2em;margin-bottom:24px}
+
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,140,0,.2);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#ff8c00,transparent)}
+.card-title{font-size:.65rem;letter-spacing:.2em;color:#ff8c00;margin-bottom:12px;text-transform:uppercase}
+
+/* DTR KVA Input */
+.kva-row{display:flex;align-items:center;gap:10px}
+.kva-row label{font-size:.7rem;color:#ff8c00;white-space:nowrap;letter-spacing:.1em}
+.kva-row input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(255,140,0,.4);border-radius:8px;padding:12px;font-family:'Courier New',monospace;font-size:1.2rem;color:#ff8c00;text-align:center;outline:none;-moz-appearance:textfield}
+.kva-row input::-webkit-outer-spin-button,
+.kva-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+.kva-row input:focus{border-color:#ff8c00;box-shadow:0 0 12px rgba(255,140,0,.3)}
+.kva-unit{font-size:.8rem;color:#ff8c00;font-weight:bold}
+
+/* Phase Grid */
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.ph label{display:block;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;text-align:center}
+.ph input{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 4px;font-family:'Courier New',monospace;font-size:1rem;color:#fff;text-align:center;outline:none;-moz-appearance:textfield}
+.ph input::-webkit-outer-spin-button,
+.ph input::-webkit-inner-spin-button{-webkit-appearance:none}
+.r label{color:#ff4444}.y label{color:#ffdd00}.b label{color:#4488ff}
+.r input:focus{border-color:#ff4444;box-shadow:0 0 8px rgba(255,68,68,.3)}
+.y input:focus{border-color:#ffdd00;box-shadow:0 0 8px rgba(255,221,0,.3)}
+.b input:focus{border-color:#4488ff;box-shadow:0 0 8px rgba(68,136,255,.3)}
+.avg{text-align:center;font-size:.6rem;color:#555;margin-top:6px}
+.avg span{color:#888}
+
+/* PF */
+.pf-row{display:flex;align-items:center;gap:10px}
+.pf-row label{color:#ff8c00;font-size:.65rem;white-space:nowrap;letter-spacing:.1em}
+.pf-row input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:1rem;color:#ff8c00;text-align:center;outline:none;-moz-appearance:textfield}
+.pf-row input::-webkit-outer-spin-button,
+.pf-row input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* Results */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.res-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,140,0,.2);border-radius:12px;padding:14px;text-align:center}
+.res-label{font-size:.55rem;letter-spacing:.15em;color:#ff8c00;margin-bottom:6px;text-transform:uppercase}
+.res-val{font-size:1.6rem;font-weight:900;color:#fff;text-shadow:0 0 15px rgba(255,140,0,.4);line-height:1}
+.res-unit{font-size:.6rem;color:#888;margin-top:3px;letter-spacing:.1em}
+
+/* % Loading big box */
+.loading-box{background:rgba(255,255,255,.03);border-radius:12px;padding:18px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;border:2px solid #333;transition:border-color .3s}
+.loading-label{font-size:.6rem;letter-spacing:.2em;color:#888;margin-bottom:6px;text-transform:uppercase}
+.loading-val{font-size:3rem;font-weight:900;line-height:1;margin-bottom:4px;transition:color .3s,text-shadow .3s}
+.loading-pct{font-size:1rem;font-weight:700;letter-spacing:.2em}
+
+/* Progress Bar */
+.bar-wrap{background:rgba(255,255,255,.05);border-radius:20px;height:14px;overflow:hidden;margin:10px 0 6px}
+.bar-fill{height:100%;border-radius:20px;transition:width .5s,background .3s;width:0%}
+
+/* Status Badge */
+.status-badge{display:inline-block;border-radius:20px;padding:6px 20px;font-size:.7rem;font-weight:bold;letter-spacing:.2em;text-transform:uppercase;margin-top:8px;transition:all .3s}
+
+/* Normal */
+.normal .loading-box{border-color:rgba(0,255,100,.3)}
+.normal .loading-val{color:#00ff64;text-shadow:0 0 20px rgba(0,255,100,.5)}
+.normal .bar-fill{background:linear-gradient(90deg,#00cc50,#00ff64)}
+.normal .status-badge{background:rgba(0,255,100,.15);border:1px solid rgba(0,255,100,.4);color:#00ff64}
+
+/* Warning */
+.warning .loading-box{border-color:rgba(255,200,0,.4)}
+.warning .loading-val{color:#ffcc00;text-shadow:0 0 20px rgba(255,200,0,.5)}
+.warning .bar-fill{background:linear-gradient(90deg,#ff8c00,#ffcc00)}
+.warning .status-badge{background:rgba(255,200,0,.15);border:1px solid rgba(255,200,0,.4);color:#ffcc00}
+
+/* Overload */
+.overload .loading-box{border-color:rgba(255,50,50,.5);animation:pulse .8s infinite alternate}
+.overload .loading-val{color:#ff3232;text-shadow:0 0 20px rgba(255,50,50,.7)}
+.overload .bar-fill{background:linear-gradient(90deg,#ff0000,#ff6666);width:100%!important}
+.overload .status-badge{background:rgba(255,50,50,.2);border:1px solid rgba(255,50,50,.5);color:#ff4444}
+@keyframes pulse{from{box-shadow:0 0 0 rgba(255,50,50,0)}to{box-shadow:0 0 20px rgba(255,50,50,.4)}}
+
+.formula{font-size:.58rem;color:#333;text-align:center;margin-top:6px;letter-spacing:.05em}
+.reset-btn{width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.62rem;letter-spacing:.2em;color:#444;cursor:pointer;margin-top:4px}
+.reset-btn:active{border-color:rgba(255,255,255,.3);color:#888}
+</style>
+</head>
+<body>
+
+<h1>⚡ DTR LOAD CALCULATOR</h1>
+<p class="sub">DISTRIBUTION TRANSFORMER LOAD MONITOR</p>
+
+<!-- DTR KVA Rating -->
+<div class="card">
+  <div class="card-title">🔧 DTR KVA Rating</div>
+  <div class="kva-row">
+    <label>DTR CAPACITY</label>
+    <input type="number" id="dtrKva" placeholder="100" oninput="calc()">
+    <span class="kva-unit">KVA</span>
+  </div>
+</div>
+
+<!-- Voltage -->
+<div class="card">
+  <div class="card-title">📊 Voltage (V) — Line to Line</div>
+  <div class="grid3">
+    <div class="ph r"><label>R — Y</label><input type="number" id="vRY" placeholder="0" oninput="calc()"></div>
+    <div class="ph y"><label>Y — B</label><input type="number" id="vYB" placeholder="0" oninput="calc()"></div>
+    <div class="ph b"><label>B — R</label><input type="number" id="vBR" placeholder="0" oninput="calc()"></div>
+  </div>
+  <div class="avg">V avg: <span id="vAvg">---</span></div>
+</div>
+
+<!-- Current -->
+<div class="card">
+  <div class="card-title">⚡ Current (A) — Per Phase</div>
+  <div class="grid3">
+    <div class="ph r"><label>R-Phase</label><input type="number" id="iR" placeholder="0" oninput="calc()"></div>
+    <div class="ph y"><label>Y-Phase</label><input type="number" id="iY" placeholder="0" oninput="calc()"></div>
+    <div class="ph b"><label>B-Phase</label><input type="number" id="iB" placeholder="0" oninput="calc()"></div>
+  </div>
+  <div class="avg">I avg: <span id="iAvg">---</span></div>
+</div>
+
+<!-- Power Factor -->
+<div class="card">
+  <div class="pf-row">
+    <label>POWER FACTOR</label>
+    <input type="number" id="pf" placeholder="0.85" value="0.85" min="0" max="1" step="0.01" oninput="calc()">
+  </div>
+  <div class="formula">Formula: KVA = (√3 × V_avg × I_avg) ÷ 1000</div>
+</div>
+
+<!-- % Loading Status -->
+<div id="statusWrap" class="normal">
+  <div class="loading-box" id="loadingBox">
+    <div class="loading-label">DTR LOADING</div>
+    <div class="loading-val" id="loadPct">—</div>
+    <div class="loading-pct" id="loadPctSign" style="color:#888">%</div>
+    <div class="bar-wrap"><div class="bar-fill" id="barFill"></div></div>
+    <div class="status-badge" id="statusBadge">Enter Values</div>
+  </div>
+</div>
+
+<!-- Result Boxes -->
+<div class="results-grid">
+  <div class="res-box">
+    <div class="res-label">Total KVA Load</div>
+    <div class="res-val" id="totalKva">—</div>
+    <div class="res-unit">KVA</div>
+  </div>
+  <div class="res-box">
+    <div class="res-label">Remaining KVA</div>
+    <div class="res-val" id="remKva">—</div>
+    <div class="res-unit">KVA</div>
+  </div>
+</div>
+
+<button class="reset-btn" onclick="resetAll()">↺ RESET ALL VALUES</button>
+
+<script>
+function avg3(a,b,c){
+  var n=[a,b,c].map(Number).filter(function(v){return !isNaN(v)&&v>0});
+  return n.length===3?(n[0]+n[1]+n[2])/3:null;
+}
+
+function calc(){
+  var dtrKva=parseFloat(document.getElementById('dtrKva').value)||0;
+  var vA=avg3(
+    document.getElementById('vRY').value,
+    document.getElementById('vYB').value,
+    document.getElementById('vBR').value
+  );
+  var iA=avg3(
+    document.getElementById('iR').value,
+    document.getElementById('iY').value,
+    document.getElementById('iB').value
+  );
+  var pf=parseFloat(document.getElementById('pf').value)||0.85;
+
+  document.getElementById('vAvg').textContent=vA?vA.toFixed(2)+' V':'---';
+  document.getElementById('iAvg').textContent=iA?iA.toFixed(3)+' A':'---';
+
+  if(vA&&iA&&dtrKva){
+    var kva=(Math.sqrt(3)*vA*iA)/1000;
+    var pct=(kva/dtrKva)*100;
+    var rem=dtrKva-kva;
+
+    document.getElementById('totalKva').textContent=kva.toFixed(2);
+    document.getElementById('remKva').textContent=rem.toFixed(2);
+    document.getElementById('loadPct').textContent=pct.toFixed(1);
+    document.getElementById('loadPctSign').style.color='inherit';
+
+    // Bar
+    var barW=Math.min(pct,100);
+    document.getElementById('barFill').style.width=barW+'%';
+
+    // Status
+    var wrap=document.getElementById('statusWrap');
+    var badge=document.getElementById('statusBadge');
+    wrap.className='';
+
+    if(pct<80){
+      wrap.className='normal';
+      badge.textContent='✅ NORMAL';
+    } else if(pct<100){
+      wrap.className='warning';
+      badge.textContent='⚠️ WARNING — Near Capacity!';
+    } else {
+      wrap.className='overload';
+      badge.textContent='🔴 OVERLOADED!';
+    }
+
+  } else {
+    document.getElementById('totalKva').textContent='—';
+    document.getElementById('remKva').textContent='—';
+    document.getElementById('loadPct').textContent='—';
+    document.getElementById('loadPctSign').style.color='#888';
+    document.getElementById('barFill').style.width='0%';
+    document.getElementById('statusWrap').className='normal';
+    document.getElementById('statusBadge').textContent='Enter Values';
+  }
+}
+
+function resetAll(){
+  ['dtrKva','vRY','vYB','vBR','iR','iY','iB'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
+  document.getElementById('pf').value='0.85';
+  calc();
+}
+</script>
+</body>
+</html>
