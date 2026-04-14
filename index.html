@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Electrical Load Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#0a0c10;font-family:'Courier New',monospace;color:#e0e0e0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;
+background-image:radial-gradient(ellipse at 20% 20%,rgba(255,140,0,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,60,0,.05) 0%,transparent 50%)}
+
+.logo{font-size:3rem;margin-bottom:10px;text-align:center}
+h1{text-align:center;font-size:1.3rem;font-weight:900;letter-spacing:.15em;color:#ff8c00;text-shadow:0 0 20px rgba(255,140,0,.5);margin-bottom:6px}
+.sub{text-align:center;font-size:.65rem;color:#555;letter-spacing:.2em;margin-bottom:40px}
+
+.cards{display:flex;flex-direction:column;gap:16px;width:100%;max-width:400px}
+
+.tool-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,140,0,.25);border-radius:16px;padding:24px 20px;text-decoration:none;color:#e0e0e0;display:block;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#ff8c00,transparent)}
+.tool-card:active{transform:scale(.98);border-color:rgba(255,140,0,.6);box-shadow:0 0 20px rgba(255,140,0,.2)}
+
+.tool-icon{font-size:2.2rem;margin-bottom:10px}
+.tool-title{font-size:1rem;font-weight:900;letter-spacing:.1em;color:#ff8c00;margin-bottom:6px}
+.tool-desc{font-size:.65rem;color:#666;letter-spacing:.05em;line-height:1.6}
+
+.badge{display:inline-block;background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.3);border-radius:20px;padding:3px 10px;font-size:.55rem;letter-spacing:.15em;color:#ff8c00;margin-top:10px}
+
+.footer{margin-top:40px;font-size:.55rem;color:#333;letter-spacing:.1em;text-align:center}
+.dot{display:inline-block;width:6px;height:6px;background:#ff8c00;border-radius:50%;margin:0 6px;vertical-align:middle;box-shadow:0 0 6px rgba(255,140,0,.5)}
+</style>
+</head>
+<body>
+
+<div class="logo">⚡</div>
+<h1>ELECTRICAL TOOLS</h1>
+<p class="sub">HIGH VOLTAGE HEROES</p>
+
+<div class="cards">
+
+  <a class="tool-card" href="dtr-load.html">
+    <div class="tool-icon">🔌</div>
+    <div class="tool-title">DTR LOAD CALCULATOR</div>
+    <div class="tool-desc">Distribution Transformer की loading check करें। KVA load, % loading, remaining capacity और overload status देखें।</div>
+    <div class="badge">DTR MONITOR</div>
+  </a>
+
+  <a class="tool-card" href="motor-load.html">
+    <div class="tool-icon">⚙️</div>
+    <div class="tool-title">MOTOR LOAD CALCULATOR</div>
+    <div class="tool-desc">3-Phase Induction Motor का load calculate करें। Horse Power, Kilowatt और kW ↔ HP converter।</div>
+    <div class="badge">3-PHASE METER</div>
+  </a>
+
+</div>
+
+<div class="footer">
+  <span class="dot"></span>
+  HIGH VOLTAGE HEROES
+  <span class="dot"></span>
+</div>
+
+</body>
+</html>
